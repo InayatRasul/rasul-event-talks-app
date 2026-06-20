@@ -308,6 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
     composerPlaceholder.style.display = 'none';
     composerActive.style.display = 'block';
     composerTextarea.value = tweetTemplate;
+
+    // Toggle active class on sticky-panel for mobile drawer slide-up
+    const stickyPanel = document.querySelector('.sticky-panel');
+    if (stickyPanel) {
+      stickyPanel.classList.add('active');
+    }
     
     updateCharCount();
   }
@@ -321,6 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
     activeReleaseUrl = '';
     composerActive.style.display = 'none';
     composerPlaceholder.style.display = 'block';
+
+    // Remove active class on sticky-panel for mobile drawer slide-down
+    const stickyPanel = document.querySelector('.sticky-panel');
+    if (stickyPanel) {
+      stickyPanel.classList.remove('active');
+    }
   }
 
   // Update Character Count
