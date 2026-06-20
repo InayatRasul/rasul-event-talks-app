@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   // UI Elements
   const refreshBtn = document.getElementById('refresh-btn');
+  const exportCsvBtn = document.getElementById('export-csv-btn');
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeToggleIcon = document.getElementById('theme-toggle-icon');
+  const themeToggleText = document.getElementById('theme-toggle-text');
   const searchInput = document.getElementById('search-input');
   const releasesList = document.getElementById('releases-list');
   const composerPlaceholder = document.getElementById('composer-placeholder');
@@ -14,6 +18,44 @@ document.addEventListener('DOMContentLoaded', () => {
   let allReleases = [];
   let selectedElement = null;
   let activeReleaseUrl = '';
+
+  // Theme Toggle Functionality
+  const sunPath = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm-12.37 1.41c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06zm12.37-12.37c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06z"/>`;
+  const moonPath = `<path d="M12.3 2a10 10 0 0 0-1.9 1.5 10 10 0 1 0 11.6 11.6c.1-.4 0-.8-.3-1a1 1 0 0 0-1 0 8 8 0 1 1-10.4-10.4 1 1 0 0 0-.4-1.8 10 10 0 0 0 2.4-.4z"/>`;
+
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light-theme');
+      document.body.classList.add('light-theme');
+      themeToggleIcon.innerHTML = moonPath;
+      themeToggleText.textContent = 'Dark Mode';
+    } else {
+      document.documentElement.classList.remove('light-theme');
+      document.body.classList.remove('light-theme');
+      themeToggleIcon.innerHTML = sunPath;
+      themeToggleText.textContent = 'Light Mode';
+    }
+  }
+
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.contains('light-theme');
+    if (isLight) {
+      document.documentElement.classList.remove('light-theme');
+      document.body.classList.remove('light-theme');
+      themeToggleIcon.innerHTML = sunPath;
+      themeToggleText.textContent = 'Light Mode';
+      localStorage.setItem('theme', 'dark');
+      showToast('Switched to Dark Mode');
+    } else {
+      document.documentElement.classList.add('light-theme');
+      document.body.classList.add('light-theme');
+      themeToggleIcon.innerHTML = moonPath;
+      themeToggleText.textContent = 'Dark Mode';
+      localStorage.setItem('theme', 'light');
+      showToast('Switched to Light Mode');
+    }
+  }
 
   // Fetch Releases
   async function fetchReleases(isManual = false) {
@@ -104,11 +146,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="release-header">
-          <span class="release-title">${release.title}</span>
-          <span class="release-date">${formattedDate}</span>
+          <div class="release-meta-group">
+            <span class="release-title">${release.title}</span>
+            <span class="release-date">${formattedDate}</span>
+          </div>
+          <button class="copy-card-btn" title="Copy release notes to clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+            Copy
+          </button>
         </div>
         <div class="release-body">${release.content}</div>
       `;
+
+      // Copy Button Action
+      const copyBtn = card.querySelector('.copy-card-btn');
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Clean text content of HTML tags
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = release.content;
+        const plainContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        const copyText = `Google Cloud BigQuery Update - ${release.title}\n\n${plainContent.trim()}\n\nFull details: ${release.link}`;
+        copyToClipboard(copyText, copyBtn);
+      });
 
       // Enable text-segment selection events inside release body
       const bodyElements = card.querySelectorAll('.release-body p, .release-body li');
@@ -129,6 +194,90 @@ document.addEventListener('DOMContentLoaded', () => {
         // Just find matching text to re-select
       }
     }
+  }
+
+  // Copy to Clipboard
+  async function copyToClipboard(text, button) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Copied release notes to clipboard!');
+      
+      const originalHTML = button.innerHTML;
+      button.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--success)">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Copied!
+      `;
+      button.classList.add('copied');
+      
+      setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      console.error('Clipboard copy failed:', err);
+      showToast('Failed to copy to clipboard.');
+    }
+  }
+
+  // Export to CSV
+  function exportToCSV() {
+    const query = searchInput.value.toLowerCase().trim();
+    const releasesToExport = query === '' ? allReleases : allReleases.filter(release => {
+      const inTitle = release.title.toLowerCase().includes(query);
+      const inContent = release.content.toLowerCase().includes(query);
+      return inTitle || inContent;
+    });
+
+    if (releasesToExport.length === 0) {
+      showToast('No releases available to export!');
+      return;
+    }
+
+    const headers = ['ID', 'Title', 'Date', 'Link', 'Plain Content'];
+    
+    // Clean content utility to strip HTML tags
+    const getPlainText = (html) => {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
+    const escapeCSV = (field) => {
+      if (field === null || field === undefined) return '';
+      let str = field.toString().replace(/"/g, '""');
+      if (str.search(/("|,|\n)/g) >= 0) {
+        str = `"${str}"`;
+      }
+      return str;
+    };
+
+    const rows = releasesToExport.map(r => [
+      r.id,
+      r.title,
+      r.updated,
+      r.link,
+      getPlainText(r.content).trim()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(escapeCSV).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bigquery_release_notes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast(`Successfully exported ${releasesToExport.length} releases to CSV!`);
   }
 
   // Selection Handler
@@ -211,6 +360,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event Listeners
   refreshBtn.addEventListener('click', () => fetchReleases(true));
   
+  exportCsvBtn.addEventListener('click', exportToCSV);
+  
+  themeToggle.addEventListener('click', toggleTheme);
+  
   composerTextarea.addEventListener('input', updateCharCount);
   
   tweetBtn.addEventListener('click', tweetContent);
@@ -232,6 +385,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderReleases(filtered);
   });
+
+  // Initialize theme setup
+  initTheme();
 
   // Initial load
   fetchReleases();

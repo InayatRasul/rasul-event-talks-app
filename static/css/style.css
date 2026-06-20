@@ -18,6 +18,67 @@
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  /* Additional Dynamic Backgrounds */
+  --bg-search: rgba(22, 30, 49, 0.5);
+  --bg-composer: rgba(15, 23, 42, 0.6);
+}
+
+:root.light-theme {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: rgba(255, 255, 255, 0.75);
+  --bg-card: rgba(255, 255, 255, 0.65);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --accent-color: #0284c7;
+  --accent-hover: #0369a1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+
+  --bg-search: rgba(255, 255, 255, 0.8);
+  --bg-composer: rgba(255, 255, 255, 0.85);
+}
+
+/* Light Theme Radial Gradients Softer Adjustments */
+body.light-theme {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.03) 0px, transparent 50%);
+}
+
+.light-theme .brand-text h1 {
+  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-theme .btn {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.light-theme .btn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+.light-theme .copy-card-btn {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.light-theme .copy-card-btn:hover {
+  background: rgba(15, 23, 42, 0.07);
+}
+
+.light-theme .release-body p.selected,
+.light-theme .release-body li.selected {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: rgba(2, 132, 199, 0.3);
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.1) inset;
 }
 
 * {
@@ -219,10 +280,10 @@ header {
 .search-box input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
-  background: rgba(22, 30, 49, 0.5);
+  background: var(--bg-search);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-primary);
   font-family: var(--font-body);
   transition: all 0.3s;
 }
@@ -287,6 +348,14 @@ header {
   margin-bottom: 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.release-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .release-title {
@@ -303,6 +372,42 @@ header {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   border: 1px solid var(--border-color);
+}
+
+.copy-card-btn {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.copy-card-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.copy-card-btn.copied {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(52, 211, 153, 0.05);
+}
+
+.copy-card-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.copy-card-btn:active svg {
+  transform: scale(0.9);
 }
 
 /* Content Markup Rendering */
@@ -423,7 +528,7 @@ header {
 }
 
 .composer-card {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--bg-composer);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
@@ -445,7 +550,7 @@ header {
   background: transparent;
   border: none;
   resize: none;
-  color: #fff;
+  color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 0.95rem;
   outline: none;
